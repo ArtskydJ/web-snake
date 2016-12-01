@@ -227,7 +227,7 @@
 		var x = snake[snake.length - 1][0] + addX
 		var y = snake[snake.length - 1][1] + addY
 
-		if	(x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) { // wall
+		if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) { // wall
 			return true
 		}
 		if (snakeIsAtCoordinates(x, y)) { // self
