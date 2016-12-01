@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Snake</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			position: absolute;
+			background-color: #eee;
+		}
+		body, button, input {
+			font-family: /* https://github.com/mrmrs/css-system-fonts */
+				-apple-system, BlinkMacSystemFont, avenir next, avenir, Segoe UI,
+				lucida grande, helvetica neue, helvetica, Fira Sans, roboto, noto,
+				Droid Sans, cantarell, oxygen, ubuntu, franklin gothic medium,
+				century gothic, Liberation Sans, sans-serif;
+		}
+		body, button {
+			font-size: 12pt;
+		}
+		#container {
+			position: relative;
+			top: 10vh;
+			left: 10vw;
+			width: 80vw;
+			height: 80vh;
+			min-height: 425px;
+			min-width: 650px;
+		}
+		#canvas {
+			width: 80%;
+			height: 100%;
+			float: left;
+			background-color: #fff;
+		}
+		#buttons-container {
+			width: 16%;
+			height: 100%;
+			padding: 0 2%;
+			float: right;
+		}
+		#buttons-container button {
+			width: 100%;
+			height: 10%;
+			margin: 5% 0;
+			padding: 0;
+			border: none;
+			cursor: pointer;
+		}
+		#btn-easy {   background-color: #0c0; }
+		#btn-normal { background-color: #0cc; }
+		#btn-hard {   background-color: #f70; }
+		#btn-death {  background-color: #f00; }
+		#btn-custom { background-color: #00f; color: #fff;}
+		#buttons-container > hr {
+			border: none;
+			border-top: 1px solid #000;
+		}
+		#buttons-container label {
+			display: block;
+		}
+		#buttons-container label input {
+			float: right;
+			width: 40%;
+			padding: 0;
+			border: 0;
+			font-size: 11pt;
+		}
+	</style>
+</head>
+<body>
+	<noscript>Your browser does not support JavaScript.</noscript>
+	<div id="container">
+		<canvas id="canvas">Your browser does not support the HTML5 canvas tag.</canvas>
+		<div id="buttons-container">
+			<button id="btn-easy">Easy</button>
+			<button id="btn-normal">Normal</button>
+			<button id="btn-hard">Hard</button>
+			<button id="btn-death">Death</button>
+			<hr>
+			<label>
+				Length:
+				<input type="number" name="length" min="1" max="20" value="3"/>
+			</label>
+			<label>
+				Grow:
+				<input type="number" name="grow" min="0" max="10" value="3"/>
+			</label>
+			<label>
+				Delay:
+				<input type="number" name="delay" min="100" max="1000" step="25" value="350"/>
+			</label>
+			<label>
+				Accelerate:
+				<input type="number" name="accelerate" min="1" max="3" step="0.01" value="1.05"/>
+			</label>
+			<button id="btn-custom">Custom</button>
+		</div>
+	</div>
+</body>
+<script>
+	const blockWidth = 50
+	const blockHeight = 50
+	const keyCodeToDirection = {
+		37: 'left',
+		38: 'up',
+		39: 'right',
+		40: 'down'
+	}
+	const directionCompatibility = {
+		left: [ 'up', 'down' ],
+		right: [ 'up', 'down' ],
+		up: [ 'left', 'right' ],
+		down: [ 'left', 'right' ]
+	}
+
+	// snake = [[ tailX, tailY ], [ midX, midY ], [ headX, headY ]]
+	// food = [ x, y ]
+
+	var snake, food, boardWidth, boardHeight, currentDirection, nextDirections, inLoop
+
+	var canvas = document.getElementById('canvas')
+
+	function createSnake(initialSnakeLength) {
+		for (var x = 0; x < initialSnakeLength; x++) {
+			snake.push([ x, 0])
+		}
+	}
+
+	function snakeIsAtCoordinates(x, y) {
+		return snake.slice(1).some(function (coords) { // don't include the tail tip
+			return coords[0] === x && coords[1] === y
+		})
+	}
+	function foodIsAtCoordinates(x, y) {
+		return food[0] === x && food[1] === y
+	}
+
+	function createFood() {
+		do {
+			var x = Math.floor(Math.random() * boardWidth)
+			var y = Math.floor(Math.random() * boardHeight)
+		} while (snakeIsAtCoordinates(x, y) || foodIsAtCoordinates(x, y))
+		food = [ x, y ]
+	}
+
+	function drawBlock(x, y, color) {
+		var draw = canvas.getContext('2d') // do this one place?
+
+		draw.fillStyle = color
+		draw.fillRect(x * blockWidth, y * blockHeight, blockWidth, blockHeight)
+	}
+	function clearBlock(x, y) {
+		var draw = canvas.getContext('2d') // do this one place?
+
+		draw.clearRect(x * blockWidth, y * blockHeight, blockWidth, blockHeight)
+	}
+	function clearAllBlocks() {
+		var draw = canvas.getContext('2d') // do this one place?
+
+		draw.clearRect(0, 0, boardWidth * blockWidth, boardHeight * blockHeight)
+	}
+
+	function updateCanvas() {
+		clearAllBlocks()
+
+		drawBlock(food[0], food[1], 'green')
+
+		snake.forEach(function (coords, index) {
+			var colorMultiplier = 3
+
+			var offset = Math.round((-index + (snake.length - 1) / 2) * colorMultiplier)
+
+			var blue = Math.max(255 + Math.min(0, offset), 50)
+			var redGreen = Math.min(Math.max(0, offset), 205)
+
+			var paddedRgHex = ('0' + redGreen.toString(16)).slice(-2)
+			var paddedBlueHex = ('0' + blue.toString(16)).slice(-2)
+			drawBlock(coords[0], coords[1], '#' + paddedRgHex + paddedRgHex + paddedBlueHex)
+		})
+	}
+
+	function resetGame(initialSnakeLength) {
+		// Instruct user to press a button?
+
+		canvas.width = canvas.clientWidth
+		canvas.height = canvas.clientHeight
+
+		var draw = canvas.getContext('2d')
+
+		boardWidth = Math.floor(canvas.width / blockWidth)
+		boardHeight = Math.floor(canvas.height / blockHeight)
+
+		draw.fillStyle = '#eee'
+		draw.fillRect(0, 0, canvas.width, canvas.height)
+		clearAllBlocks()
+
+
+		snake = []
+		food = []
+		currentDirection = 'right'
+		nextDirections = []
+		clearTimeout(inLoop)
+		inLoop = null
+
+
+		if (initialSnakeLength) {
+			createSnake(initialSnakeLength)
+			createFood()
+		}
+	}
+
+	function growSnake(growCount) {
+		for (var i = 0; i < growCount; i++) {
+			snake.unshift(snake[0])
+		}
+	}
+
+	function moveSnake(opts) {
+		currentDirection = nextDirections.shift() || currentDirection
+
+		var addX = { left: -1, right: 1 }[currentDirection] || 0
+		var addY = { up: -1, down: 1 }[currentDirection] || 0
+
+		var x = snake[snake.length - 1][0] + addX
+		var y = snake[snake.length - 1][1] + addY
+
+		if	(x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) { // wall
+			return true
+		}
+		if (snakeIsAtCoordinates(x, y)) { // self
+			return true
+		}
+
+		var last = snake.shift() // remove tail
+		snake.push([ x, y ]) // create head
+
+		if (foodIsAtCoordinates(x, y)) { // food
+			growSnake(opts.grow)
+			opts.delayMs /= opts.accelerate
+			createFood()
+		}
+	}
+
+	function getInputValue(name) {
+		return document.querySelector('input[name="' + name + '"]').value
+	}
+
+	function launchGameOnClick(btnId, makeOpts) {
+		document.getElementById(btnId).onclick = function () {
+			var opts = makeOpts()
+
+			resetGame(opts.initialLength)
+			loop(opts)
+		}
+	}
+
+	function loop(opts) {
+		clearTimeout(inLoop)
+		updateCanvas()
+		inLoop = setTimeout(function () {
+			var dead = moveSnake(opts)
+			if (snake.length && !dead) {
+				loop(opts)
+			}
+		}, opts.delayMs)
+	}
+
+	launchGameOnClick('btn-easy', function () {
+		return {
+			initialLength: 3,
+			grow: 2,
+			accelerate: 1.0333,
+			delayMs: 300
+		}
+	})
+	launchGameOnClick('btn-normal', function () {
+		return {
+			initialLength: 3,
+			grow: 3,
+			accelerate: 1.0667,
+			delayMs: 250
+		}
+	})
+	launchGameOnClick('btn-hard', function () {
+		return {
+			initialLength: 3,
+			grow: 4,
+			accelerate: 1.1111,
+			delayMs: 200
+		}
+	})
+	launchGameOnClick('btn-death', function () {
+		return {
+			initialLength: 5,
+			grow: 5,
+			accelerate: 1,
+			delayMs: 150
+		}
+	})
+	launchGameOnClick('btn-custom', function () {
+		return {
+			initialLength: Number(getInputValue('length')),
+			grow: Number(getInputValue('grow')),
+			accelerate: Number(getInputValue('accelerate')),
+			delayMs: Number(getInputValue('delay'))
+		}
+	})
+
+	window.onkeydown = function(e) {
+		var keyedDirection = keyCodeToDirection[e.keyCode]
+		var willBeGoingDirection = nextDirections[nextDirections.length - 1] || currentDirection
+		var okDirections = directionCompatibility[willBeGoingDirection]
+		if (okDirections.includes(keyedDirection)) {
+			nextDirections.push(keyedDirection)
+		}
+	}
+
+	// print the current score, and the high score for easy, normal, hard, death
+		// the board size makes a big difference for the high scores.
+	// on death, resetGame()?
+	// on resize, reset
+		// set width, variable height?
+	// on loss of focus, pause
+	// on death, make it obvious, maybe print "DEAD" in the middle
+</script>
+</html>
