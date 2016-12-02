@@ -5,8 +5,8 @@
   "main": "",
   "private": true,
   "scripts": {
-    "build": "browserify src/snake.js --standalone startGame -o bundle.js",
-    "watch": "watchify src/snake.js --verbose --standalone startGame --debug -o bundle.js"
+    "build": "browserify src/snake.js --standalone startGame | uglifyjs --mangle --compress -o bundle.js ",
+    "watch": "watchify src/snake.js --standalone startGame --verbose --debug -o bundle.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   "homepage": "https://artskydj.github.io/web-snake/",
   "devDependencies": {
     "browserify": "^13.1.1",
+    "uglify-js": "^2.7.5",
     "watchify": "^3.7.0"
   }
 }

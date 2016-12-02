@@ -53,7 +53,7 @@ function moveSnake(constants, state) {
 		return { dead: true } // When you're dead, nothing else matters
 	}
 
-	var last = snake.shift() // remove tail
+	snake.shift() // remove tail
 	snake.push([ nextX, nextY ]) // create head
 
 	if (food[0] === nextX && food[1] === nextY) { // food
