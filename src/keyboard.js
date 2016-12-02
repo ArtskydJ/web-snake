@@ -17,7 +17,7 @@ module.exports = function listenForKeyboardEvents(state) {
 		var keyedDirection = keyCodeToDirection[e.keyCode]
 		var willBeGoingDirection = state.nextDirections[state.nextDirections.length - 1] || state.currentDirection
 		var okDirections = directionCompatibility[willBeGoingDirection]
-		if (okDirections.includes(keyedDirection)) {
+		if (okDirections.indexOf(keyedDirection) !== -1) {
 			state.nextDirections.push(keyedDirection)
 		}
 	}

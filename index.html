@@ -66,11 +66,11 @@
 			})">Custom</button>
 		</div>
 	</div>
+	<script src="./bundle.js"></script>
+	<script>
+		function getInputNumber(name) {
+			return Number(document.querySelector('input[name="' + name + '"]').value)
+		}
+	</script>
 </body>
-<script src="./bundle.js"></script>
-<script>
-	function getInputNumber(name) {
-		return Number(document.querySelector('input[name="' + name + '"]').value)
-	}
-</script>
 </html>
