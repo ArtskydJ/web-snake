@@ -1,0 +1,64 @@
+body {
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	background-color: #eee;
+}
+body, button, input {
+	font-family: /* https://github.com/mrmrs/css-system-fonts */
+		-apple-system, BlinkMacSystemFont, avenir next, avenir, Segoe UI,
+		lucida grande, helvetica neue, helvetica, Fira Sans, roboto, noto,
+		Droid Sans, cantarell, oxygen, ubuntu, franklin gothic medium,
+		century gothic, Liberation Sans, sans-serif;
+}
+body, button {
+	font-size: 12pt;
+}
+#container {
+	position: relative;
+	top: 10vh;
+	left: 10vw;
+	width: 80vw;
+	height: 80vh;
+	min-height: 425px;
+	min-width: 650px;
+}
+#canvas {
+	width: 80%;
+	height: 100%;
+	float: left;
+	background-color: #fff;
+}
+#buttons-container {
+	width: 16%;
+	height: 100%;
+	padding: 0 2%;
+	float: right;
+}
+#buttons-container button {
+	width: 100%;
+	height: 10%;
+	margin: 5% 0;
+	padding: 0;
+	border: none;
+	cursor: pointer;
+}
+#btn-easy {   background-color: #0c0; }
+#btn-normal { background-color: #0cc; }
+#btn-hard {   background-color: #f70; }
+#btn-death {  background-color: #f00; }
+#btn-custom { background-color: #00f; color: #fff;}
+#buttons-container > hr {
+	border: none;
+	border-top: 1px solid #000;
+}
+#buttons-container label {
+	display: block;
+}
+#buttons-container label input {
+	float: right;
+	width: 40%;
+	padding: 0;
+	border: 0;
+	font-size: 11pt;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "web-snake",
+  "version": "",
+  "description": "",
+  "main": "",
+  "private": true,
+  "scripts": {
+    "build": "browserify src/snake.js --standalone startGame -o bundle.js",
+    "watch": "watchify src/snake.js --verbose --standalone startGame --debug -o bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArtskydJ/web-snake.git"
+  },
+  "author": "Joseph Dykstra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ArtskydJ/web-snake/issues"
+  },
+  "homepage": "https://artskydj.github.io/web-snake/",
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "watchify": "^3.7.0"
+  }
+}
