@@ -28,6 +28,8 @@ body, button {
 	height: 100%;
 	float: left;
 	background-color: #fff;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
 }
 #buttons-container {
 	width: 16%;
