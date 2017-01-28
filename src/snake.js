@@ -13,7 +13,7 @@ function createSnake(initialLength) {
 }
 
 function snakeIsAtCoordinates(snake, x, y) {
-	return snake.slice(1).some(function (coords) { // don't include the tail tip
+	return snake.some(function (coords) {
 		return coords[0] === x && coords[1] === y
 	})
 }
@@ -46,6 +46,12 @@ function moveSnake(constants, state) {
 	var nextX = snake[snake.length - 1][0] + addX
 	var nextY = snake[snake.length - 1][1] + addY
 
+	// Remove the tail piece before checking if it will run into itself
+	// so the head can move into the same coordinates that the tail moves
+	// out of. This would make the snake look wrong if it gets redrawn
+	// after it dies.
+	snake.shift() // remove tail
+
 	if (
 		nextX < 0 ||
 		nextX >= constants.board.width ||
@@ -55,7 +61,6 @@ function moveSnake(constants, state) {
 		return { dead: true } // When you're dead, nothing else matters
 	}
 
-	snake.shift() // remove tail
 	snake.push([ nextX, nextY ]) // create head
 
 	if (food[0] === nextX && food[1] === nextY) { // food
